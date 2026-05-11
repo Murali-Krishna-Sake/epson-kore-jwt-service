@@ -31,7 +31,7 @@ function parseKoreJwk(raw: string): JWK & { kid: string } {
     process.exit(1);
   }
 
-  return jwk as JWK & { kid: string };
+  return jwk as unknown as JWK & { kid: string };
 }
 
 function parsePort(raw: string | undefined, fallback: number): number {
