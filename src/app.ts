@@ -9,12 +9,14 @@ import { jwtRouter } from './routes/jwt';
 import { requestId } from './middleware/requestId';
 import { accessLog } from './middleware/accessLog';
 import { corsOptions } from './middleware/corsOptions';
+import { initSessionLimiter, getJwtLimiter } from './middleware/rateLimit';
 import { BOTS } from './config/bots';
 
 export function buildApp(): Application {
   const app = express();
 
   app.disable('x-powered-by');
+  app.set('trust proxy', config.trustProxy);
 
   app.use(requestId);
   app.use(accessLog);
@@ -22,6 +24,9 @@ export function buildApp(): Application {
   app.options('*', cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+
+  app.use('/init-session', initSessionLimiter);
+  app.use('/get-jwt', getJwtLimiter);
 
   app.get('/', (_req: Request, res: Response) => {
     res.json({

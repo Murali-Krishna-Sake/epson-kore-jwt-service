@@ -2,7 +2,7 @@ import 'dotenv/config';
 import type { JWK } from 'jose';
 import { log } from '../utils/logger';
 
-function required(name: string): string {
+export function required(name: string): string {
   const v = process.env[name];
   if (!v || v.trim() === '') {
     log.error(`Missing required env var: ${name}`);
@@ -51,10 +51,21 @@ function parseAllowedOrigins(raw: string | undefined): string[] {
     .filter(Boolean);
 }
 
+function parseTrustProxy(raw: string | undefined): boolean | number | string {
+  if (!raw || raw.trim() === '') return false;
+  const v = raw.trim();
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  const n = parseInt(v, 10);
+  if (Number.isFinite(n) && String(n) === v) return n;
+  return v;
+}
+
 export const config = {
   port: parsePort(process.env.PORT, 3001),
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
+  trustProxy: parseTrustProxy(process.env.TRUST_PROXY),
   koreJwk: parseKoreJwk(required('KORE_JWK')),
   sessionTtlSec: 30 * 24 * 3600,
   jwtExpirySec: 300,
