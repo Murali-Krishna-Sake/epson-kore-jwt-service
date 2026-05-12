@@ -1,9 +1,9 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 
-import { config } from './config';
-import { log } from './logger';
-import { redis } from './redis';
+import { config } from './config/config';
+import { log } from './utils/logger';
+import { redis } from './store/redis';
 import { sessionRouter } from './routes/session';
 import { jwtRouter } from './routes/jwt';
 import { requestId } from './middleware/requestId';

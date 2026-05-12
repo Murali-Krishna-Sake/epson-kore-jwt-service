@@ -1,8 +1,8 @@
 import http from 'http';
 import { buildApp } from './app';
-import { config } from './config';
-import { log } from './logger';
-import { closeRedis } from './redis';
+import { config } from './config/config';
+import { log } from './utils/logger';
+import { closeRedis } from './store/redis';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 

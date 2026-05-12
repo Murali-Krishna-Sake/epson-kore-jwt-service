@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { log } from '../logger';
+import { log } from '../utils/logger';
 
 export const accessLog: RequestHandler = (req, res, next) => {
   const start = process.hrtime.bigint();

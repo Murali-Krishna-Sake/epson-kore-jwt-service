@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
-import { getSession, touchSession } from '../sessionStore';
-import { issueKoreJwt } from '../jwt';
+import { getSession, touchSession } from '../store/sessionStore';
+import { issueKoreJwt } from '../services/jwt';
 import { BOTS } from '../config/bots';
-import { log } from '../logger';
+import { log } from '../utils/logger';
 
 interface GetJwtBody {
   identity?: unknown;

@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
-import { config } from './config';
-import { log } from './logger';
+import { config } from '../config/config';
+import { log } from '../utils/logger';
 
 export const redis = new Redis(config.redisUrl, {
   maxRetriesPerRequest: 3,

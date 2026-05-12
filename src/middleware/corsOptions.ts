@@ -1,6 +1,6 @@
 import { CorsOptions } from 'cors';
-import { config } from '../config';
-import { log } from '../logger';
+import { config } from '../config/config';
+import { log } from '../utils/logger';
 
 const LOCAL_DEV_PREFIXES = ['http://localhost:', 'http://127.0.0.1:'];
 

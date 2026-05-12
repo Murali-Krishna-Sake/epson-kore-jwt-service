@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { redis } from './redis';
-import { config } from './config';
-import { log } from './logger';
+import { config } from '../config/config';
+import { log } from '../utils/logger';
 
 export interface SessionData {
   fpHash: string;

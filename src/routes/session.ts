@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
-import { createSession } from '../sessionStore';
-import { log } from '../logger';
+import { createSession } from '../store/sessionStore';
+import { log } from '../utils/logger';
 
 interface InitSessionBody {
   fp?: unknown;

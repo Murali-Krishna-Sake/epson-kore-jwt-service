@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import type { JWK } from 'jose';
-import { log } from './logger';
+import { log } from '../utils/logger';
 
 function required(name: string): string {
   const v = process.env[name];
