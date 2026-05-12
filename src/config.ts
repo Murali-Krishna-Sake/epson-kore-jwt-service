@@ -54,8 +54,6 @@ function parseAllowedOrigins(raw: string | undefined): string[] {
 export const config = {
   port: parsePort(process.env.PORT, 3001),
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
-  clientId: required('CLIENT_ID'),
-  clientSecret: required('CLIENT_SECRET'),
   allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
   koreJwk: parseKoreJwk(required('KORE_JWK')),
   sessionTtlSec: 30 * 24 * 3600,

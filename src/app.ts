@@ -9,6 +9,7 @@ import { jwtRouter } from './routes/jwt';
 import { requestId } from './middleware/requestId';
 import { accessLog } from './middleware/accessLog';
 import { corsOptions } from './middleware/corsOptions';
+import { BOTS } from './config/bots';
 
 export function buildApp(): Application {
   const app = express();
@@ -26,7 +27,7 @@ export function buildApp(): Application {
     res.json({
       message: 'Epson Kore JWT Service',
       port: config.port,
-      jwe: Boolean(config.koreJwk.kty),
+      bots: Object.keys(BOTS),
     });
   });
 
