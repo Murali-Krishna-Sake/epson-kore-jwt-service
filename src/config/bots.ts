@@ -39,6 +39,30 @@ const BOT_META: Record<string, BotMeta> = {
     clientIdEnv: 'EPSON_AF_NORTH_AMERICA_DEV_CLIENT_ID',
     clientSecretEnv: 'EPSON_AF_NORTH_AMERICA_DEV_CLIENT_SECRET',
   },
+  'EPSON-CF-NORTH-AMERICA-PROD': {
+    botName: 'Prod Customer Facing Epson North America',
+    botId: 'st-96756171-2101-507a-876f-ff5d80d2699d',
+    clientIdEnv: 'EPSON_CF_NORTH_AMERICA_PROD_CLIENT_ID',
+    clientSecretEnv: 'EPSON_CF_NORTH_AMERICA_PROD_CLIENT_SECRET',
+  },
+  'EPSON-CF-LATIN-AMERICA-PROD': {
+    botName: 'Prod Customer Facing Epson Latin America',
+    botId: 'st-ef6f29c7-7c8c-5fe9-9333-b25395101b73',
+    clientIdEnv: 'EPSON_CF_LATIN_AMERICA_PROD_CLIENT_ID',
+    clientSecretEnv: 'EPSON_CF_LATIN_AMERICA_PROD_CLIENT_SECRET',
+  },
+  'EPSON-CF-BRAZIL-PROD': {
+    botName: 'Prod Customer Facing Epson Brazil',
+    botId: 'st-24182eba-3753-5d31-a6d0-d4cf0ae5f3f2',
+    clientIdEnv: 'EPSON_CF_BRAZIL_PROD_CLIENT_ID',
+    clientSecretEnv: 'EPSON_CF_BRAZIL_PROD_CLIENT_SECRET',
+  },
+  'EPSON-AF-NORTH-AMERICA-PROD': {
+    botName: 'Prod Agent Facing Epson North America',
+    botId: 'st-410fba9c-ee63-51d5-9d48-034ae701b5be',
+    clientIdEnv: 'EPSON_AF_NORTH_AMERICA_PROD_CLIENT_ID',
+    clientSecretEnv: 'EPSON_AF_NORTH_AMERICA_PROD_CLIENT_SECRET',
+  },
 };
 
 export const BOTS: Record<string, BotConfig> = Object.freeze(
