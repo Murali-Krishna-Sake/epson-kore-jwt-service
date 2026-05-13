@@ -6,6 +6,7 @@ import { log } from './utils/logger';
 import { redis } from './store/redis';
 import { sessionRouter } from './routes/session';
 import { jwtRouter } from './routes/jwt';
+import { legacyRouter } from './routes/legacy';
 import { requestId } from './middleware/requestId';
 import { accessLog } from './middleware/accessLog';
 import { corsOptions } from './middleware/corsOptions';
@@ -27,6 +28,8 @@ export function buildApp(): Application {
 
   app.use('/init-session', initSessionLimiter);
   app.use('/get-jwt', getJwtLimiter);
+
+  app.use(legacyRouter);
 
   app.get('/', (_req: Request, res: Response) => {
     res.json({
