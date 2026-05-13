@@ -23,14 +23,12 @@ jwtRouter.post(
   ): Promise<void> => {
     const appCode = req.query.app;
     if (typeof appCode !== 'string' || appCode.length === 0) {
-      log.warn('get-jwt rejected: missing app query param');
       res.status(400).json({ error: 'INVALID_APP' });
       return;
     }
 
     const bot = BOTS[appCode];
     if (!bot) {
-      log.warn('get-jwt rejected: unknown app', { appCode });
       res.status(400).json({ error: 'INVALID_APP' });
       return;
     }
@@ -38,14 +36,12 @@ jwtRouter.post(
     const rawIdentity = req.body.identity;
 
     if (typeof rawIdentity !== 'string') {
-      log.warn('get-jwt rejected: missing identity', { appCode });
       res.status(400).json({ error: 'INVALID_IDENTITY' });
       return;
     }
 
     const colonIdx = rawIdentity.indexOf(':');
     if (colonIdx <= 0 || colonIdx === rawIdentity.length - 1) {
-      log.warn('get-jwt rejected: malformed identity', { appCode });
       res.status(400).json({ error: 'INVALID_IDENTITY' });
       return;
     }
@@ -56,7 +52,6 @@ jwtRouter.post(
     try {
       const session = await getSession(tabId);
       if (!session) {
-        log.info('get-jwt: session expired', { appCode, tabId });
         res.status(401).json({ error: 'SESSION_EXPIRED' });
         return;
       }

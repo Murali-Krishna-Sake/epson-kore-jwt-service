@@ -6,27 +6,37 @@ to `idproxy.kore.com`. Sessions are bound to fingerprints via Redis.
 
 ## Endpoints
 
-| Method | Path            | Purpose                                                    |
-| ------ | --------------- | ---------------------------------------------------------- |
-| POST   | `/init-session` | Create a tab session; returns `{ sessionId }`              |
-| POST   | `/get-jwt`      | Validate identity, refresh TTL, return `{ jwt }` (JWE)     |
-| GET    | `/health`       | Liveness + Redis ping (`200 ok` / `503 degraded`)          |
-| GET    | `/`             | Service info                                               |
+| Method | Path                       | Purpose                                                    |
+| ------ | -------------------------- | ---------------------------------------------------------- |
+| POST   | `/init-session`            | Create a tab session; returns `{ sessionId }`              |
+| POST   | `/get-jwt?app=<botCode>`   | Validate identity, refresh TTL, return `{ jwt }` (JWE)     |
+| GET    | `/health`                  | Liveness + Redis ping (`200 ok` / `503 degraded`)          |
+| GET    | `/`                        | Service info (lists available bot codes)                   |
+| POST   | `/api/sts` *(legacy)*      | HS256 JWT signing for older clients — to be removed        |
 
 ### `POST /init-session`
 
 Request: `{ "fp": "<64-char lowercase hex>" }`
-Responses: `200 { sessionId }`, `400 MISSING_FP | INVALID_FP`, `500 INTERNAL_ERROR`.
+Responses: `200 { sessionId }`, `400 MISSING_FP | INVALID_FP`, `429 RATE_LIMITED`, `500 INTERNAL_ERROR`.
 
-### `POST /get-jwt`
+### `POST /get-jwt?app=<botCode>`
+
+`botCode` must be one of the keys defined in [`src/config/bots.ts`](src/config/bots.ts)
+(e.g. `EPSON-CF-NORTH-AMERICA-PROD`). The bot's `clientId` / `clientSecret`
+are loaded from env at startup; see `.env.example`.
 
 Request: `{ "identity": "<sessionId>:<fp>" }`
-Responses: `200 { jwt }`, `400 INVALID_IDENTITY`, `401 SESSION_EXPIRED | FP_MISMATCH`, `500 INTERNAL_ERROR`.
+Responses: `200 { jwt }`, `400 INVALID_APP | INVALID_IDENTITY`, `401 SESSION_EXPIRED | FP_MISMATCH`, `429 RATE_LIMITED`, `500 INTERNAL_ERROR`.
 
 The JWE is `RSA-OAEP` / `A256GCM` over an HS256-signed JWT. Claims include
-`sub` (device UUID), `iss`/`appId` (CLIENT_ID), `aud`
+`sub` (device UUID), `iss`/`appId` (bot `clientId`), `aud`
 (`https://idproxy.kore.com/authorize`), `iat`, `exp` (now + 5 min), `jti`,
 `isAnonymous: true`, and `sessionId`.
+
+### Rate limits
+
+Per-IP (or per-IP+tabId for `/get-jwt`), `429 RATE_LIMITED` on exceed:
+`/init-session` 20/min, `/get-jwt` 40/min.
 
 ## Project layout
 
@@ -34,18 +44,27 @@ The JWE is `RSA-OAEP` / `A256GCM` over an HS256-signed JWT. Claims include
 src/
   server.ts              # entry, listen + graceful shutdown
   app.ts                 # Express app factory
-  config.ts              # env loading + validation
-  logger.ts              # zero-dep console logger
-  redis.ts               # ioredis client + closeRedis()
-  sessionStore.ts        # session:tab:<id> CRUD
-  jwt.ts                 # Kore JWE issuance (cached key)
+  config/
+    config.ts            # env loading + validation
+    bots.ts              # per-bot metadata + credential loading
+  utils/
+    logger.ts            # zero-dep console logger
+  store/
+    redis.ts             # ioredis client + closeRedis()
+    sessionStore.ts      # session:tab:<id> CRUD
+  services/
+    jwt.ts               # Kore JWE issuance (cached key)
   routes/
     session.ts           # POST /init-session
     jwt.ts               # POST /get-jwt
+    legacy.ts            # POST /api/sts, GET /api/health (legacy)
   middleware/
     requestId.ts         # X-Request-Id + req.id
-    accessLog.ts         # structured request log
+    accessLog.ts         # request log (4xx/5xx only by default)
     corsOptions.ts       # CORS origin rule
+    rateLimit.ts         # per-IP rate limits for /init-session, /get-jwt
+api/
+  index.ts               # Vercel serverless entrypoint (wraps buildApp())
 ```
 
 ## Setup
@@ -71,13 +90,18 @@ Type-check only: `npm run typecheck`.
 
 | Variable          | Required | Default                    | Notes                                                            |
 | ----------------- | -------- | -------------------------- | ---------------------------------------------------------------- |
-| `CLIENT_ID`       | yes      | —                          | Kore client ID; used as `iss` and `appId`                        |
-| `CLIENT_SECRET`   | yes      | —                          | HS256 signing key                                                |
 | `KORE_JWK`        | yes      | —                          | Kore public JWK (single-line JSON, must include `kty` and `kid`) |
 | `PORT`            | no       | `3001`                     |                                                                  |
 | `REDIS_URL`       | no       | `redis://localhost:6379`   |                                                                  |
 | `ALLOWED_ORIGINS` | no       | (empty)                    | Comma-separated. `localhost`/`127.0.0.1` always allowed          |
-| `LOG_LEVEL`       | no       | `info`                     | Set to `debug` to enable `log.debug`                             |
+| `TRUST_PROXY`     | no       | (off)                      | Express `trust proxy`. Hop count (e.g. `1`) or `true`            |
+| `LOG_LEVEL`       | no       | `warn`                     | Levels: `debug`, `info`, `warn`, `error`                         |
+
+Per-bot credentials live in env as `EPSON_*_CLIENT_ID` / `EPSON_*_CLIENT_SECRET`
+pairs — one per bot defined in [`src/config/bots.ts`](src/config/bots.ts). See
+[`.env.example`](.env.example) for the full list. The legacy `/api/sts` route
+reads its own `BOT_*_JWT_SECRET` / `_JWT_ISSUER` / `_JWT_AUDIENCE` / `_JWT_EXPIRY`
+vars per bot id.
 
 Missing or malformed required vars cause the process to log and exit
 immediately at startup.

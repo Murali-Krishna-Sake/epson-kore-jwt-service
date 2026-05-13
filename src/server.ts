@@ -61,11 +61,10 @@ process.on('SIGTERM', () => {
 
 process.on('uncaughtException', (err: Error) => {
   log.error('uncaughtException', { error: err.message, stack: err.stack });
-  void shutdown('uncaughtException');
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason: unknown) => {
   const msg = reason instanceof Error ? reason.message : String(reason);
   log.error('unhandledRejection', { reason: msg });
-  void shutdown('unhandledRejection');
 });
