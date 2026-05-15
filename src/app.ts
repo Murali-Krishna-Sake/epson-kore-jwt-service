@@ -26,8 +26,8 @@ export function buildApp(): Application {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  app.use('/init-session', initSessionLimiter);
-  app.use('/get-jwt', getJwtLimiter);
+  app.use('/api/init-session', initSessionLimiter);
+  app.use('/api/get-jwt', getJwtLimiter);
 
   app.use(legacyRouter);
 
@@ -39,7 +39,7 @@ export function buildApp(): Application {
     });
   });
 
-  app.get('/health', async (_req: Request, res: Response) => {
+  app.get('/api/v2/health', async (_req: Request, res: Response) => {
     try {
       const pong = await redis.ping();
       const healthy = pong === 'PONG';

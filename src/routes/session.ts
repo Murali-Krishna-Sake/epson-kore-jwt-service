@@ -12,7 +12,7 @@ const FP_PATTERN = /^[0-9a-f]{64}$/;
 export const sessionRouter = Router();
 
 sessionRouter.post(
-  '/init-session',
+  '/api/init-session',
   async (req: Request<unknown, unknown, InitSessionBody>, res: Response): Promise<void> => {
     const { fp } = req.body;
 

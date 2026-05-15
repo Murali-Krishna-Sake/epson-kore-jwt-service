@@ -16,7 +16,7 @@ interface GetJwtQuery {
 export const jwtRouter = Router();
 
 jwtRouter.post(
-  '/get-jwt',
+  '/api/get-jwt',
   async (
     req: Request<unknown, unknown, GetJwtBody, GetJwtQuery>,
     res: Response,
