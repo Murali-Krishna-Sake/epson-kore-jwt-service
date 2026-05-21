@@ -4,7 +4,7 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { log } from '../utils/logger';
 
-const LEGACY_BOT_IDS = ['na-customer', 'la-customer', 'brazil-customer', 'na-agent'] as const;
+const LEGACY_BOT_IDS = ['na-customer', 'la-customer', 'brazil-customer', 'na-agent', 'na-customer-dev', 'la-customer-dev', 'brazil-customer-dev', 'na-agent-dev'] as const;
 type LegacyBotId = (typeof LEGACY_BOT_IDS)[number];
 
 const LEGACY_ENV_PREFIX: Record<LegacyBotId, string> = {
@@ -12,12 +12,16 @@ const LEGACY_ENV_PREFIX: Record<LegacyBotId, string> = {
   'la-customer': 'BOT_LA_CUSTOMER',
   'brazil-customer': 'BOT_BRAZIL_CUSTOMER',
   'na-agent': 'BOT_NA_AGENT',
+  'na-customer-dev': 'BOT_NA_CUSTOMER_DEV',
+  'la-customer-dev': 'BOT_LA_CUSTOMER_DEV',
+  'brazil-customer-dev': 'BOT_BRAZIL_CUSTOMER_DEV',
+  'na-agent-dev': 'BOT_NA_AGENT_DEV',
 };
 
 const DEFAULT_EXPIRY_SEC = 3500;
 
 interface LegacyCreds {
-  secret: string;
+  secret: string; 
   issuer: string;
   audience: string;
   expirySec: number;
